@@ -1,0 +1,112 @@
+#include <Arduino.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+// inisialisasi sensor garis
+const int sensor_ir[] = {7, 6, 5, 4, 3};
+
+// inisialisasi motor driver
+const int IN_1 = 13;
+const int IN_2 = 12;
+const int enable_A = 11;
+const int enable_B = 10;
+const int IN_3 = 9;
+const int IN_4 = 8;
+
+// ini adalah variabel sensornya
+// gunakan sebaik mungkin
+int nilai_sensor[] = {0, 0, 0, 0, 0};
+int nilai_beban_sensor[] = {-30, -10, 0, 10, 30};
+int nilai_awal[] = {0, 0, 0, 0, 0};
+int nilai_akhir = 0;
+int sum_nilai_sensor = 0;
+
+// akselerasi track lurus
+int akselerasi = 90;
+
+// inisialisasi lcd
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+void setup()
+{
+    lcd.init();
+    lcd.backlight();
+    Serial.begin(9600);
+    for (size_t i = 8; i <= 13; i++)
+        pinMode(i, OUTPUT);
+
+    for (size_t i = 0; i <= 4; i++)
+        pinMode(sensor_ir[i], INPUT);
+}
+
+void loop()
+{
+    for (size_t i = 0; i <= 4; i++)
+        nilai_sensor[i] = digitalRead(sensor_ir[i]);
+
+    for (size_t i = 0; i <= 4; i++)
+    {
+        if (nilai_sensor[i] == 0)
+            nilai_awal[i] = nilai_beban_sensor[i];
+        else if (nilai_sensor[i] == 1)
+            nilai_awal[i] = 0;
+    }
+    // jumlahkan semua nilai sensor
+    sum_nilai_sensor = nilai_awal[0] + nilai_awal[1] + nilai_awal[2] + nilai_awal[3] + nilai_awal[4];
+
+    // kode untuk akselerasi pada belokan
+    nilai_akhir = nilai_akhir + 8;
+    if (nilai_akhir >= 200)
+        nilai_akhir = 255;
+    // kode akselerasi pada lintasan lurus
+    akselerasi = akselerasi + 8;
+    if (akselerasi >= 180)
+        akselerasi = 255;
+
+    // ini kode untuk kontrol motor drivernya
+    if (sum_nilai_sensor > 0)
+    {
+        analogWrite(enable_A, nilai_akhir);
+        analogWrite(enable_B, nilai_akhir);
+        digitalWrite(IN_1, HIGH);
+        digitalWrite(IN_2, LOW);
+        digitalWrite(IN_3, LOW);
+        digitalWrite(IN_4, HIGH);
+        akselerasi = 120;
+    }
+    else if (sum_nilai_sensor < 0)
+    {
+        analogWrite(enable_A, nilai_akhir);
+        analogWrite(enable_B, nilai_akhir);
+        digitalWrite(IN_1, LOW);
+        digitalWrite(IN_2, HIGH);
+        digitalWrite(IN_3, HIGH);
+        digitalWrite(IN_4, LOW);
+        akselerasi = 120;
+    }
+    else
+    {
+        digitalWrite(IN_1, HIGH);
+        digitalWrite(IN_2, LOW);
+        digitalWrite(IN_3, HIGH);
+        digitalWrite(IN_4, LOW);
+        analogWrite(enable_A, akselerasi);
+        analogWrite(enable_B, akselerasi);
+        nilai_akhir = 120;
+    }
+
+    // ini kode untuk menampilkan nilai sensor
+    lcd.setCursor(0, 0);
+    lcd.print("s:");
+    for (size_t i = 0; i <= 4; i++)
+        lcd.print(nilai_sensor[i]);
+    lcd.print(" na:");
+    lcd.print(nilai_akhir);
+    lcd.print("     ");
+
+    lcd.setCursor(0, 1);
+    lcd.print("sum:");
+    lcd.print(sum_nilai_sensor);
+    lcd.print(" acl:");
+    lcd.print(akselerasi);
+    lcd.print("    ");
+}

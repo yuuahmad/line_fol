@@ -1,0 +1,23 @@
+#include <Arduino.h>
+#include <Wire.h>
+unsigned long myTime;
+unsigned long selisih_waktu;
+unsigned long waktu_sebelum = 0;
+void setup()
+{
+    Serial.begin(9600);
+}
+void loop()
+{
+    waktu_sebelum = myTime;
+    myTime = millis();
+    selisih_waktu = myTime - waktu_sebelum;
+
+    Serial.print("sebelum: ");
+    Serial.print(waktu_sebelum);
+    Serial.print(" Time: ");
+    Serial.print(myTime); // prints time since program started
+    Serial.print(" selisih: ");
+    Serial.println(selisih_waktu);
+    delay(1000); // wait a second so as not to send massive amounts of data
+}

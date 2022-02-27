@@ -1,0 +1,96 @@
+#include <Arduino.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+// inisialisasi sensor garis
+const int sensor_ir_1 = 7;
+const int sensor_ir_2 = 6;
+const int sensor_ir_3 = 5;
+const int sensor_ir_4 = 4;
+const int sensor_ir_5 = 3;
+
+// inisialisasi motor driver
+const int IN_1 = 13;
+const int IN_2 = 12;
+const int enable_A = 11;
+const int enable_B = 10;
+const int IN_3 = 9;
+const int IN_4 = 8;
+
+// ini adalah variabel sensornya
+int nilai_sensor_1 = 0;
+int nilai_sensor_2 = 0;
+int nilai_sensor_3 = 0;
+int nilai_sensor_4 = 0;
+int nilai_sensor_5 = 0;
+
+// inisialisasi lcd
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+void setup()
+{
+    lcd.init();
+    lcd.backlight();
+    Serial.begin(9600);
+    for (size_t i = 8; i <= 13; i++)
+    {
+        pinMode(i, OUTPUT);
+    }
+    pinMode(sensor_ir_1, INPUT);
+    pinMode(sensor_ir_2, INPUT);
+    pinMode(sensor_ir_3, INPUT);
+    pinMode(sensor_ir_4, INPUT);
+    pinMode(sensor_ir_5, INPUT);
+}
+
+void loop()
+{
+    // set kecepatan motor
+    // analogWrite(enable_A, 100);
+    // analogWrite(enable_B, 100);
+
+    // int nilai_sensor_1 = digitalRead(sensor_1);
+    // int nilai_sensor_2 = digitalRead(sensor_2);
+    // Serial.print("sensor 1 = ");
+    // Serial.print(nilai_sensor_1);
+    // Serial.print("  sensor 2 = ");
+    // Serial.println(nilai_sensor_2);
+    // if ((nilai_sensor_1 == 0 && nilai_sensor_2 == 0) || (nilai_sensor_1 == 1 && nilai_sensor_2 == 1))
+    // {
+    //     digitalWrite(IN_1, HIGH);
+    //     digitalWrite(IN_2, LOW);
+    //     digitalWrite(IN_3, HIGH);
+    //     digitalWrite(IN_4, LOW);
+    // }
+    // else if (nilai_sensor_1 == 1 && nilai_sensor_2 == 0)
+    // {
+    //     digitalWrite(IN_1, HIGH);
+    //     digitalWrite(IN_2, LOW);
+    //     digitalWrite(IN_3, LOW);
+    //     digitalWrite(IN_4, HIGH);
+    // }
+    // else if (nilai_sensor_1 == 0 && nilai_sensor_2 == 1)
+    // {
+    //     digitalWrite(IN_1, LOW);
+    //     digitalWrite(IN_2, HIGH);
+    //     digitalWrite(IN_3, HIGH);
+    //     digitalWrite(IN_4, LOW);
+    // }
+
+    // yang atas tadi adalah kode pertama dan
+    // dibawah ini adalah kode dengan pid
+
+    nilai_sensor_1 = digitalRead(sensor_ir_1);
+    nilai_sensor_2 = digitalRead(sensor_ir_2);
+    nilai_sensor_3 = digitalRead(sensor_ir_3);
+    nilai_sensor_4 = digitalRead(sensor_ir_4);
+    nilai_sensor_5 = digitalRead(sensor_ir_5);
+
+    lcd.setCursor(0, 0);
+    lcd.print("sen:");
+    lcd.print(nilai_sensor_1);
+    lcd.print(nilai_sensor_2);
+    lcd.print(nilai_sensor_3);
+    lcd.print(nilai_sensor_4);
+    lcd.print(nilai_sensor_5);
+    // delay(200);
+}

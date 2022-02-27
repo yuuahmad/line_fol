@@ -1,0 +1,58 @@
+#include <Arduino.h>
+
+const int currentPin = A0;
+int sensitivity = 66;
+int adcValue = 0;
+int offsetVoltage = 2500;
+double adcVoltage = 0;
+double currentValue = 0;
+
+int jumlah_array = 9;
+double nilai_array[9];
+double nilai_max = -100;
+double nilai_min = 100;
+int index = 0;
+
+void setup()
+{
+    Serial.begin(9600);
+    delay(2000);
+}
+
+void loop()
+{
+    adcValue = analogRead(currentPin);
+    adcVoltage = (adcValue / 1024.0) * 5000;
+    currentValue = ((adcVoltage - offsetVoltage) / sensitivity);
+
+    nilai_array[index] = currentValue;
+    index++;
+    if (index >= 9)
+    {
+        index = 0;
+        nilai_max = -100;
+        nilai_min = 100;
+    }
+    // reset ke nol, jika nilai indexnya sudah mencapai maximal
+    if (currentValue > nilai_max)
+        nilai_max = currentValue;
+    if (currentValue < nilai_min)
+        nilai_min = currentValue;
+    float total = 0;
+    for (int i = 0; i <= jumlah_array; i++)
+        total += nilai_array[index];
+    float rata_rata = total / jumlah_array;
+
+    Serial.print("raw= ");
+    Serial.print(adcValue);
+    Serial.print(" cur= ");
+    Serial.print(currentValue, 2);
+    Serial.print("A");
+    Serial.print(" max= ");
+    Serial.print(nilai_max);
+    Serial.print(" min= ");
+    Serial.print(nilai_min);
+    Serial.print(" avrg= ");
+    Serial.println(rata_rata);
+    delay(200);
+}
